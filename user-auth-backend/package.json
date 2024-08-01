@@ -1,0 +1,11 @@
+{
+  "name": "user-auth-backend",
+  "version": "1.0.0",
+  "description": "backend code for user token authentication",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "harshiiet negi",
+  "license": "ISC"
+}
