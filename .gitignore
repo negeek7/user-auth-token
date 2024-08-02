@@ -1,2 +1,3 @@
 /user-auth-backend/node_modules
 /user-auth-frontend/node_modules
+/user-auth-backend/.env
