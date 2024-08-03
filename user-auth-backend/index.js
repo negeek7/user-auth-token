@@ -31,27 +31,25 @@ app.get('/', (req, res) => {
 
 
 app.post('/signup', async (req, res) => {
-    console.log(req.body);
-    if (!req.body) return res.send("Body is missing!")
-    let saltRounds = 6;
-    let creds = req.body;
-    if (!creds.username || !creds.password) return res.send("Username or password is missing!")
-    const user = {
-        name: creds.username,
-        password: creds.password
-    }
-    bcrypt.genSalt(saltRounds, (err, salt) => {
-        bcrypt.hash(creds.password, salt, async (err, hash) => {
-            try {
-                user.password = hash
-                await User.create(user)
-                res.send("User successfully created")
-            } catch (err) {
-                console.log(err, "ERROR")
-                res.status(401).send("User couldnt be created")
-            }
-            
+    try {
+        let { username, password } = req.body;
+
+        if (!username || !password) return res.status(400).send("Username or password is missing!");
+
+        let saltRounds = 10;
+        let salt = await bcrypt.genSalt(saltRounds);
+        let hashedPassword = await bcrypt.hash(password, salt);
+
+        const user = new User({
+            username,
+            password: hashedPassword,
         })
-    })
+        await user.save()
+        res.status(200).send("User successfully created!")
+
+    } catch (error) {
+        console.log("Error while sign up!", error)
+        res.status(500).send("Error while creating a user!")
+    }
 })
 
