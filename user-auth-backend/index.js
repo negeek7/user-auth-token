@@ -2,6 +2,7 @@
 import express from "express";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 import { User } from './schema/userSchema.js'
 import { handleApiError } from "./utils/utils.js";
 
@@ -62,12 +63,17 @@ app.post('/signin', async (req, res) => {
         let {username, password} = req.body
         if(!username || !password) return res.status(400).send("Username or password missing!")
         let user = await User.findOne({username: {$eq: username}}, {created_at: 0})
+
+        if(!user) return res.status(404).send("User does not exist!")
+
         let passwordResult = await bcrypt.compare(password, user.password)
         if(passwordResult) {
             return res.status(200).send("Authenticated!")
         } else {
             return res.status(401).send("Wrong password! Check again.")
         }
+
+
     } catch (error) {
         handleApiError(res, error, "Trouble signing in user", "sign in api error")
     }
