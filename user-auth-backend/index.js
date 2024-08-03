@@ -68,6 +68,7 @@ app.post('/signin', async (req, res) => {
 
         let passwordResult = await bcrypt.compare(password, user.password)
         if(passwordResult) {
+            let token = jwt.sign({username: user.username, })
             return res.status(200).send("Authenticated!")
         } else {
             return res.status(401).send("Wrong password! Check again.")
