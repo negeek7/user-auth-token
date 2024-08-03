@@ -3,7 +3,7 @@ import express from "express";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import { User } from './schema/userSchema.js'
-import { ConsoleError } from "./utils/utils.js";
+import { handleApiError } from "./utils/utils.js";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -13,7 +13,7 @@ const PORT = process.env.PORT;
         await mongoose.connect(process.env.MONGO_URL, {
             dbName: "userauth"
         })
-        console.log("Connected to database...")
+        console.log("Connected to database ✅")
     } catch (error) {
         ConsoleError(error, "xxx Error connecting to database xxx")
     }
@@ -46,10 +46,29 @@ app.post('/signup', async (req, res) => {
         })
         await user.save()
         res.status(200).send("User successfully created!")
-
     } catch (error) {
         console.log("Error while sign up!", error)
-        res.status(500).send("Error while creating a user!")
+        handleApiError(res, error, "Trouble creating user", "sign up api error")
     }
 })
 
+
+app.post('/signin', async (req, res) => {
+    // take username and password
+    // find user
+    // get hashedPassword
+    // match with the input user password
+    try {
+        let {username, password} = req.body
+        if(!username || !password) return res.status(400).send("Username or password missing!")
+        let user = await User.findOne({username: {$eq: username}}, {created_at: 0})
+        let passwordResult = await bcrypt.compare(password, user.password)
+        if(passwordResult) {
+            return res.status(200).send("Authenticated!")
+        } else {
+            return res.status(401).send("Wrong password! Check again.")
+        }
+    } catch (error) {
+        handleApiError(res, error, "Trouble signing in user", "sign in api error")
+    }
+})
