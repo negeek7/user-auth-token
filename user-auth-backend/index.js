@@ -44,6 +44,7 @@ app.post('/signup', async (req, res) => {
         const user = new User({
             username,
             password: hashedPassword,
+            role: 'admin'
         })
         await user.save()
         res.status(200).send("User successfully created!")
@@ -68,8 +69,10 @@ app.post('/signin', async (req, res) => {
 
         let passwordResult = await bcrypt.compare(password, user.password)
         if(passwordResult) {
-            let token = jwt.sign({username: user.username, })
-            return res.status(200).send("Authenticated!")
+            let token = jwt.sign({username: user.username, role: user.role ? user.role : ''}, process.env.JWT_SECRET_KEY, {
+                expiresIn: '30m'
+            })
+            return res.status(200).json({message: "Authenticated", token})
         } else {
             return res.status(401).send("Wrong password! Check again.")
         }
@@ -77,5 +80,30 @@ app.post('/signin', async (req, res) => {
 
     } catch (error) {
         handleApiError(res, error, "Trouble signing in user", "sign in api error")
+    }
+})
+
+
+// create a user (only user with role admin can create user)
+
+app.post('/createuser', async (req, res) => {
+    let {username} = req.body
+    if(!username) return res.status(400).send("Please provide username")
+        try {
+        let usertoken = req.headers.authorization.split(' ')[1]
+        if(usertoken) {
+            let userInfo = jwt.decode(usertoken)
+            if(userInfo.role == 'admin') {
+                let newUser = new User({
+                    username: username,
+                    password: "randomPassword123",
+                    role: 'user'
+                })
+                await newUser.save()
+                res.status(200).json({message: "User created!", user: {name: newUser.username, role: newUser.role}})
+            }
+        }
+    } catch (error) {
+        handleApiError(res, error, "Error creating user", "create user api error")
     }
 })
