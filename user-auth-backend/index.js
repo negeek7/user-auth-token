@@ -33,34 +33,52 @@ app.get('/', (req, res) => {
 app.post('/signup', async (req, res) => {
     try {
         let { username, password } = req.body;
-        if(req.headers.authorization) {
-            let usertoken = req.headers.authorization.split(' ')[1] 
+
+
+        // check if client has sent token - create new user
+        if (req.headers.authorization) {
+            let usertoken = req.headers.authorization.split(' ')[1]
             let userInfo = jwt.decode(usertoken)
             console.log(userInfo, "userInfo")
-            let isExpired = isTokenExpired(userInfo.exp)
-            if(isExpired) return res.status(400).send("Token has been expired")
-            let verifyToken = jwt.verify(userInfo.username, process.env.JWT_SECRET_KEY)
-            console.log(verifyToken, "verifyToken")
+
+            // let isExpired = isTokenExpired(userInfo.exp)
+            // if(isExpired) return res.status(400).send("Token has been expired")
+
+            let verifyToken = jwt.verify(usertoken, process.env.JWT_SECRET_KEY)
+            if (verifyToken) {
+                console.log(verifyToken, "verifyToken")
+                let randomPassword = "randomPass123"
+                return createUser(username, randomPassword, 'user', res)
+            }
         }
 
+        // sign up user
         if (!username || !password) return res.status(400).send("Username or password is missing!");
+        return createUser(username, password, 'admin', res)
+    } catch (error) {
+        console.log("Error while sign up!", error)
+    }
+})
 
+async function createUser(username, password, role, res) {
+    try {
+        let user = await User.findOne({ username: { $eq: username } })
+        if (user) return res.status(400).json({ status: "Error", message: "user already exists" })
         let saltRounds = 10;
         let salt = await bcrypt.genSalt(saltRounds);
         let hashedPassword = await bcrypt.hash(password, salt);
-
-        const user = new User({
-            username,
+        let newUser = new User({
+            username: username,
             password: hashedPassword,
-            role: 'admin'
+            role: role
         })
-        await user.save()
-        res.status(200).send("User successfully created!")
+        await newUser.save()
+        return res.status(200).send("User successfully created!")
     } catch (error) {
         console.log("Error while sign up!", error)
-        handleApiError(res, error, "Trouble creating user", "sign up api error")
+        return handleApiError(res, error, "Trouble creating user", "sign up api error")
     }
-})
+}
 
 
 app.post('/signin', async (req, res) => {
@@ -75,17 +93,22 @@ app.post('/signin', async (req, res) => {
 
         if (!user) return res.status(404).send("User does not exist!")
 
+        console.log(user, "user found")
+
         let passwordResult = await bcrypt.compare(password, user.password)
         if (passwordResult) {
             let token = jwt.sign({ username: user.username, role: user.role ? user.role : '' }, process.env.JWT_SECRET_KEY, {
                 expiresIn: '30m'
             })
-            return res.status(200).json({ message: "Authenticated", token })
+            return res.status(200).json({
+                message: "Authenticated", user: {
+                    username,
+                    token
+                }
+            })
         } else {
             return res.status(401).send("Wrong password! Check again.")
         }
-
-
     } catch (error) {
         handleApiError(res, error, "Trouble signing in user", "sign in api error")
     }
