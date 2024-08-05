@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import { User } from './schema/userSchema.js'
-import { handleApiError } from "./utils/utils.js";
+import { handleApiError, isTokenExpired } from "./utils/utils.js";
 
 const app = express();
 const PORT = process.env.PORT;
@@ -30,10 +30,18 @@ app.get('/', (req, res) => {
     res.send(`Hello my name is ${process.env.NAME}`)
 })
 
-
 app.post('/signup', async (req, res) => {
     try {
         let { username, password } = req.body;
+        if(req.headers.authorization) {
+            let usertoken = req.headers.authorization.split(' ')[1] 
+            let userInfo = jwt.decode(usertoken)
+            console.log(userInfo, "userInfo")
+            let isExpired = isTokenExpired(userInfo.exp)
+            if(isExpired) return res.status(400).send("Token has been expired")
+            let verifyToken = jwt.verify(userInfo.username, process.env.JWT_SECRET_KEY)
+            console.log(verifyToken, "verifyToken")
+        }
 
         if (!username || !password) return res.status(400).send("Username or password is missing!");
 
@@ -86,33 +94,33 @@ app.post('/signin', async (req, res) => {
 
 // create a user (only user with role admin can create user)
 
-app.post('/createuser', async (req, res) => {
-    let { username } = req.body
-    if (!username) return res.status(400).send("Please provide username")
-    try {
-        let user = User.findOne({ username: { $eq: username } })
-        if (!user) return res.status(404).send("User does not exist!")
-        let usertoken = req.headers.authorization.split(' ')[1]
-        if (usertoken) {
-            let userInfo = jwt.decode(usertoken)
-            if (userInfo.role == 'admin') {
-                let saltRounds = 10;
-                let salt = await bcrypt.genSalt(saltRounds);
-                let password = 'randompassword123'
-                let hashedPassword = await bcrypt.hash(password, salt);
-                const user = new User({
-                    username,
-                    password: hashedPassword,
-                    role: 'user'
-                })
-                await user.save()
-                res.status(200).send("User successfully created!")
-            } else {
-                res.status(400).send("You do not have permission to create a user!")
+// app.post('/createuser', async (req, res) => {
+//     let { username } = req.body
+//     if (!username) return res.status(400).send("Please provide username")
+//     try {
+//         let user = User.findOne({ username: { $eq: username } })
+//         if (!user) return res.status(404).send("User does not exist!")
+//         let usertoken = req.headers.authorization.split(' ')[1]
+//         if (usertoken) {
+//             let userInfo = jwt.decode(usertoken)
+//             if (userInfo.role == 'admin') {
+//                 let saltRounds = 10;
+//                 let salt = await bcrypt.genSalt(saltRounds);
+//                 let password = 'randompassword123'
+//                 let hashedPassword = await bcrypt.hash(password, salt);
+//                 const user = new User({
+//                     username,
+//                     password: hashedPassword,
+//                     role: 'user'
+//                 })
+//                 await user.save()
+//                 res.status(200).send("User successfully created!")
+//             } else {
+//                 res.status(400).send("You do not have permission to create a user!")
 
-            }
-        }
-    } catch (error) {
-        handleApiError(res, error, "Error creating user", "create user api error")
-    }
-})
+//             }
+//         }
+//     } catch (error) {
+//         handleApiError(res, error, "Error creating user", "create user api error")
+//     }
+// })

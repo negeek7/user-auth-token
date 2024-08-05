@@ -12,3 +12,7 @@ export function createToken(payload, expiresIn = '30m') {
     })
     return token
 }
+
+export function isTokenExpired(expiryDate){
+    return Date.now() >= expiryDate
+}
