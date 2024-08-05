@@ -34,7 +34,6 @@ app.post('/signup', async (req, res) => {
     try {
         let { username, password } = req.body;
 
-
         // check if client has sent token - create new user
         if (req.headers.authorization) {
             let usertoken = req.headers.authorization.split(' ')[1]
@@ -51,7 +50,6 @@ app.post('/signup', async (req, res) => {
                 return createUser(username, randomPassword, 'user', res)
             }
         }
-
         // sign up user
         if (!username || !password) return res.status(400).send("Username or password is missing!");
         return createUser(username, password, 'admin', res)
@@ -113,37 +111,3 @@ app.post('/signin', async (req, res) => {
         handleApiError(res, error, "Trouble signing in user", "sign in api error")
     }
 })
-
-
-// create a user (only user with role admin can create user)
-
-// app.post('/createuser', async (req, res) => {
-//     let { username } = req.body
-//     if (!username) return res.status(400).send("Please provide username")
-//     try {
-//         let user = User.findOne({ username: { $eq: username } })
-//         if (!user) return res.status(404).send("User does not exist!")
-//         let usertoken = req.headers.authorization.split(' ')[1]
-//         if (usertoken) {
-//             let userInfo = jwt.decode(usertoken)
-//             if (userInfo.role == 'admin') {
-//                 let saltRounds = 10;
-//                 let salt = await bcrypt.genSalt(saltRounds);
-//                 let password = 'randompassword123'
-//                 let hashedPassword = await bcrypt.hash(password, salt);
-//                 const user = new User({
-//                     username,
-//                     password: hashedPassword,
-//                     role: 'user'
-//                 })
-//                 await user.save()
-//                 res.status(200).send("User successfully created!")
-//             } else {
-//                 res.status(400).send("You do not have permission to create a user!")
-
-//             }
-//         }
-//     } catch (error) {
-//         handleApiError(res, error, "Error creating user", "create user api error")
-//     }
-// })
