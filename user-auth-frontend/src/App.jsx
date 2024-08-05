@@ -1,9 +1,14 @@
-function App() {
+import React from 'react';
+import Login from './pages/Login';
+import { Route, Routes } from 'react-router-dom';
 
+function App() {
   return (
-    <>
-      <div className='bg-red-400'>Hello</div>
-    </>
+    <div className="h-screen">
+      <Routes>
+        <Route path="/" element={<Login />} />
+      </Routes>
+    </div>
   )
 }
 
