@@ -3,6 +3,8 @@ import express from "express";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
+import cors from 'cors';
+import bodyParser from "body-parser";
 import { User } from './schema/userSchema.js'
 import { handleApiError, isTokenExpired } from "./utils/utils.js";
 
@@ -20,7 +22,15 @@ const PORT = process.env.PORT;
     }
 })();
 
+let corsOptions = {
+    origin: "*",
+    credentials: true,
+    optionSuccessStatus: 200,
+}
+
 app.use(express.json())
+app.use(cors(corsOptions))
+let jsonParser = bodyParser.json()
 
 app.listen(PORT, () => {
     console.log(`lisening on port ${PORT}`)
@@ -31,9 +41,10 @@ app.get('/', (req, res) => {
 })
 
 app.post('/signup', async (req, res) => {
+    console.log(req.body, "req.body")
     try {
         let { username, password } = req.body;
-
+        console.log(username, password)
         // check if client has sent token - create new user
         if (req.headers.authorization) {
             let usertoken = req.headers.authorization.split(' ')[1]
@@ -51,7 +62,7 @@ app.post('/signup', async (req, res) => {
             }
         }
         // sign up user
-        if (!username || !password) return res.status(400).send("Username or password is missing!");
+        if (!username || !password) return res.status(400).json({status: "Error", message: "Username or password is missing!"});
         return createUser(username, password, 'admin', res)
     } catch (error) {
         console.log("Error while sign up!", error)
@@ -59,6 +70,7 @@ app.post('/signup', async (req, res) => {
 })
 
 async function createUser(username, password, role, res) {
+    console.log("create user")
     try {
         let user = await User.findOne({ username: { $eq: username } })
         if (user) return res.status(400).json({ status: "Error", message: "user already exists" })
