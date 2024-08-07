@@ -1,10 +1,13 @@
 import React, { useEffect, useState } from 'react'
 import apiCaller from '../apiCaller/apiCaller'
+import { useNavigate } from 'react-router-dom'
 
 function Login() {
 
     const [tabState, setTabState] = useState('login')
     const [formInfo, setFormInfo] = useState({ username: '', password: '', cpassword: '' })
+
+    let navigate = useNavigate() 
 
 
     useEffect(() => {
@@ -23,7 +26,7 @@ function Login() {
             let response = await apiCaller('/signin', 'POST', formInfo)    
             console.log(response, "response")
             if(response.message == "Authenticated") {
-               route 
+                navigate('/home') 
             }
         }
         if(tabState === 'signup') {
