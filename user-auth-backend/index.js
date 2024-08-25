@@ -4,7 +4,6 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cors from 'cors';
-import bodyParser from "body-parser";
 import { User } from './schema/userSchema.js'
 import { handleApiError, isTokenExpired } from "./utils/utils.js";
 
@@ -22,14 +21,14 @@ const PORT = process.env.PORT;
     }
 })();
 
-let corsOptions = {
-    origin: "http://localhost:5173",
-    credentials: true,
-    optionSuccessStatus: 200,
-}
+// let corsOptions = {
+//     origin: "http://localhost:5173",
+//     credentials: true,
+//     optionSuccessStatus: 200,
+// }
 
 app.use(express.json())
-app.use(cors(corsOptions))
+// app.use(cors(corsOptions))
 
 app.listen(PORT, () => {
     console.log(`lisening on port ${PORT}`)
