@@ -3,7 +3,7 @@ import express from "express";
 import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
-import cors from 'cors';
+// import cors from 'cors';
 import bodyParser from "body-parser";
 import { User } from './schema/userSchema.js'
 import { handleApiError, isTokenExpired } from "./utils/utils.js";
@@ -18,19 +18,18 @@ const PORT = process.env.PORT;
         })
         console.log("Connected to database ✅")
     } catch (error) {
-        ConsoleError(error, "xxx Error connecting to database xxx")
+        console.log("xxx Error connecting to database xxx", error)
     }
 })();
 
-let corsOptions = {
-    origin: "*",
-    credentials: true,
-    optionSuccessStatus: 200,
-}
+// let corsOptions = {
+//     origin: "*",
+//     credentials: true,
+//     optionSuccessStatus: 200,
+// }
 
 app.use(express.json())
-app.use(cors(corsOptions))
-let jsonParser = bodyParser.json()
+// app.use(cors(corsOptions))
 
 app.listen(PORT, () => {
     console.log(`lisening on port ${PORT}`)
@@ -40,7 +39,7 @@ app.get('/', (req, res) => {
     res.send(`Hello my name is ${process.env.NAME}`)
 })
 
-app.post('/signup', async (req, res) => {
+app.post('/api/signup', async (req, res) => {
     console.log(req.body, "req.body")
     try {
         let { username, password } = req.body;
@@ -91,7 +90,7 @@ async function createUser(username, password, role, res) {
 }
 
 
-app.post('/signin', async (req, res) => {
+app.post('/api/signin', async (req, res) => {
     // take username and password
     // find user
     // get hashedPassword
@@ -110,6 +109,7 @@ app.post('/signin', async (req, res) => {
             let token = jwt.sign({ username: user.username, role: user.role ? user.role : '' }, process.env.JWT_SECRET_KEY, {
                 expiresIn: '30m'
             })
+            res.cookie('authToken', token, {httpOnly: true, maxAge: 900000})
             return res.status(200).json({
                 message: "Authenticated", user: {
                     username,
