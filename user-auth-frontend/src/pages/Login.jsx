@@ -31,7 +31,7 @@ function Login() {
         }
         if(tabState === 'signup') {
             console.log(formInfo, "FORM INFO")
-            apiCaller('/api/signup', 'POST', formInfo)       
+            apiCaller('api/signup', 'POST', formInfo)       
         }
     }
 
