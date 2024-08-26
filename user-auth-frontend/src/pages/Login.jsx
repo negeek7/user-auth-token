@@ -74,7 +74,7 @@ function Login() {
                 className="hover:bg-purple-900 bg-purple-800 mt-8 focus:outline-none"
                 onClick={handleSubmit}
             >
-                Submit
+                Submit and Enjoy!
             </button>
         </div>
     )

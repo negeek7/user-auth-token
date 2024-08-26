@@ -7,6 +7,14 @@ import cors from 'cors';
 import { User } from './schema/userSchema.js'
 import { handleApiError, isTokenExpired } from "./utils/utils.js";
 
+import { fileURLToPath } from 'url';
+import path, { dirname } from 'path';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
+
+console.log(__dirname);
+
 const app = express();
 const PORT = process.env.PORT;
 
@@ -26,17 +34,30 @@ const PORT = process.env.PORT;
 //     credentials: true,
 //     optionSuccessStatus: 200,
 // }
+console.log(__dirname)
+
 
 app.use(express.json())
+
+app.use(express.static(path.join(__dirname,'serve', 'dist')))
+
+
+app.get('/serve',(req,res) => {
+    // res.sendFile(path.join(__dirname,'dist','index.html'));
+    res.send("Done")
+})
+
+app.get('/', (req, res) => {
+    res.send("Hello")
+})
+
 // app.use(cors(corsOptions))
+
 
 app.listen(PORT, () => {
     console.log(`lisening on port ${PORT}`)
 })
 
-app.get('/', (req, res) => {
-    res.send(`Hello my name is ${process.env.NAME}`)
-})
 
 app.post('/api/signup', async (req, res) => {
     console.log(req.body, "req.body")
@@ -122,3 +143,4 @@ app.post('/api/signin', async (req, res) => {
         handleApiError(res, error, "Trouble signing in user", "sign in api error")
     }
 })
+
