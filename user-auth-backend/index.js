@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import bcrypt from "bcrypt";
 import jwt from "jsonwebtoken";
 import cors from 'cors';
-import { User } from './schema/userSchema.js'
+import { User } from './models/user.model.js'
 import { handleApiError, isTokenExpired } from "./utils/utils.js";
 
 import { fileURLToPath } from 'url';
@@ -60,7 +60,6 @@ app.listen(PORT, () => {
 
 
 app.post('/api/signup', async (req, res) => {
-    console.log(req.body, "req.body")
     try {
         let { username, password } = req.body;
         console.log(username, password)

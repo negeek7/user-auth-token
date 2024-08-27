@@ -1,5 +1,4 @@
-import mongoose, { mongo } from 'mongoose'
-
+import mongoose from 'mongoose'
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -11,10 +10,10 @@ const userSchema = new mongoose.Schema({
         required: true
     },
     role: String,
-    created_at: {
-        type: Date,
-        default: Date.now()
-    },
-}, {versionKey: false})
+
+    // timestamps true automatically adds {createdAt} {updatedAt} keys
+}, {versionKey: false, timestamps: true })
+
+
 
 export const User = mongoose.model('user', userSchema)

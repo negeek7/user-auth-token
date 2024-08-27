@@ -23,7 +23,7 @@ function Login() {
 
     const handleSubmit = async () => {
         if (tabState === 'login') {
-            let response = await apiCaller('/signin', 'POST', formInfo)    
+            let response = await apiCaller('api/signin', 'POST', formInfo)    
             console.log(response, "response")
             if(response.message == "Authenticated") {
                 navigate('/home') 
