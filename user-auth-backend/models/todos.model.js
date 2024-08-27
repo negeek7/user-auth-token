@@ -5,10 +5,11 @@ export const todosSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    items: Array,
     done: {
         type: Boolean,
         default: false
     },
     completedOn: Date,
     dueDate: Date
-})
+}, {timestamps: true})

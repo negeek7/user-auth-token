@@ -134,3 +134,24 @@ app.post('/api/signin', async (req, res) => {
     }
 })
 
+
+app.post('/api/todos/new', async (req, res) => {
+    const {userid, title, items} = req.body
+
+    // prepare an update todo object
+
+    const newTodoObj = {
+        title,
+        items
+    }
+
+    const result = await User.findByIdAndUpdate(userid, {$push: {todos: newTodoObj}})
+
+    console.log(result, "result")
+    res.send()
+
+
+
+    
+
+})
