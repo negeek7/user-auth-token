@@ -142,15 +142,8 @@ app.post('/api/todos/new', async (req, res) => {
     const newTodoObj = {
         title,
         items
-    }
-
-    // try {
-    //     let result = await User.findByIdAndUpdate(userid, {$push: {todos: newTodoObj}})
-    //     console.log(result, "result")
-    // } catch (error) {
-    //     console.log(error, "ERROR")
-    // }
-
+    } 
+    
     try {
         const user = await User.findById(userid)
         user.todos.push(newTodoObj)
