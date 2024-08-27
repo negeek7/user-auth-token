@@ -39,25 +39,15 @@ console.log(__dirname)
 
 app.use(express.json())
 
-app.use(express.static(path.join(__dirname,'serve', 'dist')))
-
-
-app.get('/serve',(req,res) => {
-    // res.sendFile(path.join(__dirname,'dist','index.html'));
-    res.send("Done")
-})
-
 app.get('/', (req, res) => {
     res.send("Hello")
 })
 
 // app.use(cors(corsOptions))
 
-
 app.listen(PORT, () => {
     console.log(`lisening on port ${PORT}`)
 })
-
 
 app.post('/api/signup', async (req, res) => {
     try {
@@ -101,7 +91,7 @@ async function createUser(username, password, role, res) {
             role: role
         })
         await newUser.save()
-        return res.status(200).send("User successfully created!")
+        return res.status(200).json({status: "Success", message: "User successfully created!"})
     } catch (error) {
         console.log("Error while sign up!", error)
         return handleApiError(res, error, "Trouble creating user", "sign up api error")

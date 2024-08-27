@@ -2,7 +2,7 @@ import jwt from 'jsonwebtoken'
 
 export function handleApiError(res, error, responseMessage, message){
     console.log(message, error)
-    return res.status(500).send(responseMessage)
+    return res.status(500).json({status: "Error", message: responseMessage})
 }
 
 export function createToken(payload, expiresIn = '30m') {

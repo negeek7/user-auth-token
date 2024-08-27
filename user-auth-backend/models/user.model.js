@@ -1,4 +1,5 @@
 import mongoose from 'mongoose'
+import { todosSchema } from './todos.model'
 
 const userSchema = new mongoose.Schema({
     username: {
@@ -11,9 +12,10 @@ const userSchema = new mongoose.Schema({
     },
     role: String,
 
+    todos: [todosSchema]
+
     // timestamps true automatically adds {createdAt} {updatedAt} keys
 }, {versionKey: false, timestamps: true })
-
 
 
 export const User = mongoose.model('user', userSchema)
