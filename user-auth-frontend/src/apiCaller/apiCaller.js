@@ -11,6 +11,6 @@ export default async function apiCaller(path, method = "GET", body = {}) {
     if(!response.ok) {
         throw new Error("Error")
     } else {
-        return response || await response.json()
+        return await response.json()
     }
 }
