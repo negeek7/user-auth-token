@@ -139,19 +139,25 @@ app.post('/api/todos/new', async (req, res) => {
     const {userid, title, items} = req.body
 
     // prepare an update todo object
-
     const newTodoObj = {
         title,
         items
     }
 
-    const result = await User.findByIdAndUpdate(userid, {$push: {todos: newTodoObj}})
+    // try {
+    //     let result = await User.findByIdAndUpdate(userid, {$push: {todos: newTodoObj}})
+    //     console.log(result, "result")
+    // } catch (error) {
+    //     console.log(error, "ERROR")
+    // }
 
-    console.log(result, "result")
-    res.send()
-
-
-
-    
-
+    try {
+        const user = await User.findById(userid)
+        user.todos.push(newTodoObj)
+        await user.save()
+        res.status(200).json({status: "Success", message: "New todo created"})
+    } catch (error) {
+        res.status(400).json({status: "Error", message: error.name})
+        console.log(error, "ERROR")
+    }
 })

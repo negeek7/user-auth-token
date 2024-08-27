@@ -3,7 +3,7 @@ import mongoose from 'mongoose'
 export const todosSchema = new mongoose.Schema({
     title: {
         type: String,
-        required: true
+        required: [true, "title is required"]
     },
     items: Array,
     done: {
