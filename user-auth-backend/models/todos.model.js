@@ -1,4 +1,3 @@
-
 import mongoose from 'mongoose'
 
 export const todosSchema = new mongoose.Schema({
@@ -6,6 +5,10 @@ export const todosSchema = new mongoose.Schema({
         type: String,
         required: true
     },
-    completed: Boolean,
-    completedOn: Date
+    done: {
+        type: Boolean,
+        default: false
+    },
+    completedOn: Date,
+    dueDate: Date
 })
